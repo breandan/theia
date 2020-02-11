@@ -10,9 +10,15 @@
     "@types/glob": "^5.0.30",
     "@types/tar": "4.0.0",
     "glob": "^7.1.2",
+    "inversify": "^5.0.1",
     "mkdirp": "^0.5.0",
+    "monaco-languageclient": "^0.10.2",
     "sha1": "^1.1.1",
-    "tar": "^4.0.0"
+    "tar": "^4.0.0",
+    "vscode-jsonrpc": "^4.1.0-next",
+    "vscode-languageserver-protocol": "3.15.0-next.15",
+    "vscode-ws-jsonrpc": "0.1.1",
+    "yargs": "^11.1.0"
   },
   "devDependencies": {
     "@theia/ext-scripts": "^0.15.0"

@@ -8,6 +8,8 @@
     "@theia/filesystem": "^0.15.0",
     "@theia/process": "^0.15.0",
     "@theia/workspace": "^0.15.0",
+    "inversify": "^5.0.1",
+    "vscode-jsonrpc": "^4.1.0-next",
     "xterm": "3.13.0"
   },
   "publishConfig": {

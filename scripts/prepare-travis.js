@@ -27,7 +27,7 @@ const os = require('os');
 
 const directories = ['node_modules'];
 
-const workspaces = JSON.parse(JSON.parse(child_process.execSync('yarn workspaces info --json').toString()).data);
+const workspaces = JSON.parse(JSON.parse(child_process.execSync('yarn workspaces --json info').toString()).data);
 for (const name in workspaces) {
     const workspace = workspaces[name];
     const nodeModulesPath = [workspace.location, 'node_modules'].join('/');

@@ -23,7 +23,7 @@ import {
     ClientCapabilities,
     ServerCapabilities,
     Disposable,
-    DocumentSelector
+    DocumentSelector,
 } from '../language-client-services';
 import { SemanticHighlight, SemanticHighlightingParams } from './semantic-highlighting-protocol';
 
