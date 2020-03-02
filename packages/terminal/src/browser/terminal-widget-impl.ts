@@ -79,8 +79,7 @@ export class TerminalWidgetImpl extends TerminalWidget implements StatefulWidget
 
     @postConstruct()
     protected init(): void {
-        this.title.caption = this.options.title || this.TERMINAL;
-        this.title.label = this.options.title || this.TERMINAL;
+        this.setTitle(this.options.title || this.TERMINAL);
         this.title.iconClass = 'fa fa-terminal';
 
         if (this.options.destroyTermOnClose === true) {
@@ -391,7 +390,6 @@ export class TerminalWidgetImpl extends TerminalWidget implements StatefulWidget
         }
         this.toDisposeOnConnect.dispose();
         this.toDispose.push(this.toDisposeOnConnect);
-        this.term.reset();
         const waitForConnection = this.waitForConnection = new Deferred<MessageConnection>();
         this.webSocketConnectionProvider.listen({
             path: `${terminalsPath}/${this.terminalId}`,
@@ -470,12 +468,24 @@ export class TerminalWidgetImpl extends TerminalWidget implements StatefulWidget
         this.term.scrollToTop();
     }
 
+    scrollToBottom(): void {
+        this.term.scrollToBottom();
+    }
+
     scrollPageUp(): void {
         this.term.scrollPages(-1);
     }
 
     scrollPageDown(): void {
         this.term.scrollPages(1);
+    }
+
+    resetTerminal(): void {
+        this.term.reset();
+    }
+
+    writeLine(text: string): void {
+        this.term.writeln(text);
     }
 
     get onTerminalDidClose(): Event<TerminalWidget> {
@@ -538,4 +548,8 @@ export class TerminalWidgetImpl extends TerminalWidget implements StatefulWidget
         this.term.attachCustomKeyEventHandler(e => this.customKeyHandler(e));
     }
 
+    setTitle(title: string): void {
+        this.title.caption = title;
+        this.title.label = title;
+    }
 }

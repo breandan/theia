@@ -189,8 +189,36 @@ export class TerminalFrontendContribution implements TerminalService, CommandCon
         const widget = this.shell.currentWidget;
         if (widget instanceof TerminalWidget) {
             this.setCurrentTerminal(widget);
+            this.setLastUsedTerminal(widget);
         } else if (!this._currentTerminal || !this._currentTerminal.isVisible) {
             this.setCurrentTerminal(undefined);
+        }
+    }
+
+    // IDs of the most recently used terminals
+    protected mostRecentlyUsedTerminalIds: string[] = [];
+
+    protected getLastUsedTerminalId(): string | undefined {
+        return this.mostRecentlyUsedTerminalIds[this.mostRecentlyUsedTerminalIds.length - 1];
+    }
+
+    get lastUsedTerminal(): TerminalWidget | undefined {
+        const id = this.getLastUsedTerminalId();
+        if (id) {
+            return this.getById(id);
+        }
+    }
+
+    protected setLastUsedTerminal(lastUsed: TerminalWidget): void {
+        const lastUsedTerminalId = lastUsed.id;
+        if (!this.lastUsedTerminal || this.getLastUsedTerminalId() !== lastUsedTerminalId) {
+            this.mostRecentlyUsedTerminalIds.push(lastUsedTerminalId);
+            lastUsed.onTerminalDidClose(() => {
+                const index = this.mostRecentlyUsedTerminalIds.findIndex(id => id === lastUsedTerminalId);
+                if (index >= 0) {
+                    this.mostRecentlyUsedTerminalIds.splice(index, 1);
+                }
+            });
         }
     }
 
@@ -250,7 +278,7 @@ export class TerminalFrontendContribution implements TerminalService, CommandCon
                     return !this.shell.activeWidget.getSearchBox().isVisible;
                 }
                 return false;
-            } ,
+            },
             execute: () => {
                 const termWidget = (this.shell.activeWidget as TerminalWidget);
                 const terminalSearchBox = termWidget.getSearchBox();
@@ -273,11 +301,11 @@ export class TerminalFrontendContribution implements TerminalService, CommandCon
         });
 
         commands.registerCommand(TerminalCommands.SCROLL_LINE_UP, {
-                isEnabled: () => this.shell.activeWidget instanceof TerminalWidget,
-                isVisible: () => false,
-                execute: () => {
-                    (this.shell.activeWidget as TerminalWidget).scrollLineUp();
-                }
+            isEnabled: () => this.shell.activeWidget instanceof TerminalWidget,
+            isVisible: () => false,
+            execute: () => {
+                (this.shell.activeWidget as TerminalWidget).scrollLineUp();
+            }
         });
         commands.registerCommand(TerminalCommands.SCROLL_LINE_DOWN, {
             isEnabled: () => this.shell.activeWidget instanceof TerminalWidget,
@@ -495,10 +523,13 @@ export class TerminalFrontendContribution implements TerminalService, CommandCon
         if (!widget.isAttached) {
             this.shell.addWidget(widget, op.widgetOptions);
         }
-        if (op.mode === 'activate') {
-            this.shell.activateWidget(widget.id);
-        } else if (op.mode === 'reveal') {
-            this.shell.revealWidget(widget.id);
+        if (op.mode === 'activate' || op.mode === 'reveal') {
+            if (op.mode === 'activate') {
+                this.shell.activateWidget(widget.id);
+            } else {
+                this.shell.revealWidget(widget.id);
+            }
+            this.setLastUsedTerminal(widget);
         }
     }
 
