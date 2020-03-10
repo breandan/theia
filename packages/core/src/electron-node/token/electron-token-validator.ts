@@ -16,6 +16,7 @@
 
 import * as http from 'http';
 import * as cookie from 'cookie';
+import * as crypto from 'crypto';
 import { injectable } from 'inversify';
 import { ElectronSecurityToken } from '../../electron-common/electron-token';
 
@@ -42,7 +43,14 @@ export class ElectronTokenValidator {
     }
 
     isTokenValid(token: ElectronSecurityToken): boolean {
-        return typeof token === 'object' && token.value === this.electronSecurityToken!.value;
+        try {
+            const received = Buffer.from(token.value, 'utf8');
+            const expected = Buffer.from(this.electronSecurityToken!.value, 'utf8');
+            return typeof token === 'object' && received.byteLength === expected.byteLength && crypto.timingSafeEqual(received, expected);
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
     }
 
     /**
